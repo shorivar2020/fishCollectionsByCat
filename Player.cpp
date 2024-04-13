@@ -3,91 +3,64 @@
 class Player {
 public:
     sf::Sprite sprite;
-    sf::Texture texture;
     sf::Vector2f velocity;
-    sf::Texture front;
-    sf::Texture back;
-    sf::Texture left;
-    sf::Texture left2;
-    sf::Texture right;
-    sf::Texture right2;
+    sf::Texture texture;
+    sf::Texture frontTexture;
+    sf::Texture backTexture;
+    sf::Texture leftTexture;
+    sf::Texture left2Texture;
+    sf::Texture rightTexture;
+    sf::Texture right2Texture;
     int stepCount = 0;
+
     Player() {
-        if (!texture.loadFromFile("cat.png")) {
-            std::cerr << "Failed to load player texture!" << std::endl;
+        loadTextures();
+        setupSprite();
+    }
+
+    void loadTextures() {
+        if (!texture.loadFromFile("cat.png") ||
+            !frontTexture.loadFromFile("cat_a1.png") ||
+            !backTexture.loadFromFile("cat_b.png") ||
+            !leftTexture.loadFromFile("cat1l.png") ||
+            !left2Texture.loadFromFile("cat2l.png") ||
+            !rightTexture.loadFromFile("cat1.png") ||
+            !right2Texture.loadFromFile("cat2.png")) {
+            std::cerr << "Failed to load player textures!" << std::endl;
         }
-        if (!left.loadFromFile("cat1l.png")) {
-            std::cerr << "Failed to load player texture!" << std::endl;
-        }
-        if (!right.loadFromFile("cat1.png")) {
-            std::cerr << "Failed to load player texture!" << std::endl;
-        }
-        if (!front.loadFromFile("cat_a1.png")) {
-            std::cerr << "Failed to load player texture!" << std::endl;
-        }
-        if (!back.loadFromFile("cat_b.png")) {
-            std::cerr << "Failed to load player texture!" << std::endl;
-        }
-        if (!right2.loadFromFile("cat2.png")) {
-            std::cerr << "Failed to load player texture!" << std::endl;
-        }
-        if (!left2.loadFromFile("cat2l.png")) {
-            std::cerr << "Failed to load player texture!" << std::endl;
-        }
+    }
+
+    void setupSprite() {
         sprite.setTexture(texture);
         sprite.setPosition(100, 100); // Starting position
+        sprite.setOrigin(texture.getSize().x / 2.0f, texture.getSize().y / 2.0f); // Center the origin
         velocity.x = 0;
         velocity.y = 0;
     }
 
-    sf::Texture * changeLeft(){
-        if(sprite.getTexture() == &left){
-            return &left2;
-        }else{
-            return &left;
-        }
+    sf::Texture* changeLeft() {
+        return (sprite.getTexture() == &leftTexture) ? &left2Texture : &leftTexture;
     }
 
-    sf::Texture * changeRight(){
-        if(sprite.getTexture() == &right){
-            return &right2;
-        }else{
-            return &right;
-        }
+    sf::Texture* changeRight() {
+        return (sprite.getTexture() == &rightTexture) ? &right2Texture : &rightTexture;
     }
 
-    void draw(sf::RenderWindow& window) {
-
+    void draw(sf::RenderWindow& window) const {
         window.draw(sprite);
     }
 
     void move(float offsetX, float offsetY) {
         stepCount++;
-        if(offsetY == -1){
-            sprite.setTexture(back);
-        }
-        if(offsetY == 1){
-            sprite.setTexture(front);
-        }
-        if(offsetX == -1){
-            sf::Texture *l = &left;
-            if(stepCount%4 == 0){
-                l = changeLeft();
-            }
-            sprite.setTexture(*l);
-        }
-        if(offsetX == 1){
-            sf::Texture *r = &right;
-            if(stepCount%4 == 0){
-                r = changeRight();
-            }
-            sprite.setTexture(*r);
+        if (offsetY == -1) {
+            sprite.setTexture(backTexture);
+        } else if (offsetY == 1) {
+            sprite.setTexture(frontTexture);
+        } else if (offsetX == -1) {
+            sprite.setTexture(*changeLeft());
+        } else if (offsetX == 1) {
+            sprite.setTexture(*changeRight());
         }
         sprite.move(offsetX * 5.0f, offsetY * 5.0f);
-
-    }
-
-    sf::Vector2f getPosition() {
-        return sprite.getPosition();
     }
 };

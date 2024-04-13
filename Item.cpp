@@ -1,40 +1,31 @@
-//
-// Created by User on 4/13/2024.
-//
-
 #include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/System.hpp>
-
-enum Color {
-    White,
-    Blue,
-    Red,
-    Green,
-};
+#include <iostream>
 
 class Item {
 public:
-    sf::CircleShape shape;
+    sf::Sprite sprite;
     bool collected;
-    int id;
-    Color color;
+    bool isItFood;
+    sf::Texture foodTexture;
+    sf::Texture trashTexture;
 
-    Item(float x, float y, int itemId, int note) : id(itemId) {
-        shape.setRadius(10);
-        if (note == 1) {
-            shape.setFillColor(sf::Color::Blue);
+    Item(float x, float y, bool foodBool) : collected(false), isItFood(foodBool) {
+        if (!foodTexture.loadFromFile("food.png")) {
+            std::cerr << "Failed to load food texture!" << std::endl;
         }
-        else if (note == 2) {
-            shape.setFillColor(sf::Color::Red);
+        if (!trashTexture.loadFromFile("trashcan.png")) {
+            std::cerr << "Failed to load trash texture!" << std::endl;
         }
-        else if (note == 3) {
-            shape.setFillColor(sf::Color::Green);
-        }
-        else {
-            shape.setFillColor(sf::Color::White);
-        }
-        shape.setPosition(x, y);
-        collected = false;
+        sprite.setPosition(x, y);
+        setTexture();
+    }
+
+    void setTexture() {
+        sprite.setTexture(isItFood ? foodTexture : trashTexture);
+    }
+
+    void draw(sf::RenderWindow& window) const {
+        window.draw(sprite);
     }
 };
+
